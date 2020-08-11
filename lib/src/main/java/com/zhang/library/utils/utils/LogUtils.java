@@ -16,17 +16,17 @@ import java.util.Locale;
  */
 public final class LogUtils {
 
-    private static boolean IS_DEBUG;
+    private static boolean isDebug;
 
     private LogUtils() {
-        IS_DEBUG = BuildConfig.DEBUG;
+        isDebug = BuildConfig.DEBUG;
     }
 
-    public static void setIsDebug(boolean isDebug) {
-        IS_DEBUG = isDebug;
+    public static void setDebug(boolean isDebug) {
+        LogUtils.isDebug = isDebug;
     }
 
-    public static String createLog(StackTraceElement[] traceElements, String msg) {
+    private static String createLog(StackTraceElement[] traceElements, String msg) {
         String methodName = getMethodName(traceElements);
         int lineNumber = getLineNumber(traceElements);
         return new StringBuilder()
@@ -45,7 +45,7 @@ public final class LogUtils {
     }
 
     public static void verbose(String tag, String msg) {
-        if (!IS_DEBUG)
+        if (!isDebug)
             return;
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
@@ -74,7 +74,7 @@ public final class LogUtils {
     }
 
     public static void debug(String tag, String msg) {
-        if (!IS_DEBUG)
+        if (!isDebug)
             return;
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
@@ -103,7 +103,7 @@ public final class LogUtils {
     }
 
     public static void info(String tag, String msg) {
-        if (!IS_DEBUG)
+        if (!isDebug)
             return;
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
@@ -132,7 +132,7 @@ public final class LogUtils {
     }
 
     public static void warn(String tag, String msg) {
-        if (!IS_DEBUG)
+        if (!isDebug)
             return;
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
@@ -148,7 +148,7 @@ public final class LogUtils {
     }
 
     public static void error(String tag, String msg) {
-        if (!IS_DEBUG)
+        if (!isDebug)
             return;
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
@@ -218,7 +218,24 @@ public final class LogUtils {
     }
 
     private static String getClassName(StackTraceElement[] traceElements) {
-        String fileName = traceElements[2].getFileName();
+        String fileName = null;
+        for (StackTraceElement element : traceElements) {
+            if (element.getClassName().equals(LogUtils.class.getName()))
+                continue;
+
+            fileName = element.getFileName();
+            int indexOf = fileName.indexOf(".java");
+            if (indexOf == -1) {
+                indexOf = fileName.indexOf(".Java");
+            }
+            if (indexOf == -1) {
+                return fileName;
+            }
+            fileName = fileName.substring(0, indexOf);
+            return fileName;
+        }
+
+        fileName = traceElements[2].getFileName();
         int indexOf = fileName.indexOf(".java");
         if (indexOf == -1) {
             indexOf = fileName.indexOf(".Java");
@@ -231,10 +248,24 @@ public final class LogUtils {
     }
 
     private static String getMethodName(StackTraceElement[] traceElements) {
+        for (StackTraceElement element : traceElements) {
+            if (element.getClassName().equals(LogUtils.class.getName()))
+                continue;
+
+            return element.getMethodName();
+        }
+
         return traceElements[1].getMethodName();
     }
 
     private static int getLineNumber(StackTraceElement[] traceElements) {
+        for (StackTraceElement element : traceElements) {
+            if (element.getClassName().equals(LogUtils.class.getName()))
+                continue;
+
+            return element.getLineNumber();
+        }
+
         return traceElements[1].getLineNumber();
     }
 
@@ -243,15 +274,11 @@ public final class LogUtils {
         StackTraceElement[] traceElements = new Throwable().fillInStackTrace().getStackTrace();
 
         String symbol1 = "->", symbol2 = ".", symbol3 = "(", symbol4 = ")", symbol5 = ":";
-        String qposStr = "qpos";
         StringBuilder builder = new StringBuilder();
         //保存日志调用记录
         for (int i = traceElements.length - 1; i >= 2; i--) {
             StackTraceElement trace = traceElements[i];
             String callingClass = trace.getClassName();
-            if (!callingClass.contains(qposStr)) {
-                continue;
-            }
             callingClass = callingClass.substring(callingClass.lastIndexOf('.') + 1);
             callingClass = callingClass.substring(callingClass.lastIndexOf('$') + 1);
             if (!TextUtils.isEmpty(builder)) {
