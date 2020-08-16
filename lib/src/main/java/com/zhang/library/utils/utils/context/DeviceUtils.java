@@ -1,4 +1,4 @@
-package com.zhang.library.utils.utils;
+package com.zhang.library.utils.utils.context;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -18,12 +18,12 @@ public class DeviceUtils extends ContextUtils {
 
     /** 获取设备屏幕宽度 */
     public static int getWidth() {
-        return ViewUtils.getScreenWidth();
+        return ResUtils.getScreenWidth();
     }
 
     /** 获取设备屏幕高度 */
     public static int getHeight() {
-        return ViewUtils.getScreenHeight();
+        return ResUtils.getScreenHeight();
     }
 
     /** 获取系统语言 */
