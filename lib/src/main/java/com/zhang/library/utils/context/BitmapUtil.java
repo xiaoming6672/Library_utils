@@ -1,4 +1,4 @@
-package com.zhang.library.utils.utils.context;
+package com.zhang.library.utils.context;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,7 +26,7 @@ import android.os.Build.VERSION;
 import android.provider.MediaStore;
 import android.util.Base64;
 
-import com.zhang.library.utils.utils.LogUtils;
+import com.zhang.library.utils.LogUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;

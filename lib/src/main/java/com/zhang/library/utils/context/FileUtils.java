@@ -1,4 +1,4 @@
-package com.zhang.library.utils.utils.context;
+package com.zhang.library.utils.context;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.zhang.library.utils.utils;
+package com.zhang.library.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

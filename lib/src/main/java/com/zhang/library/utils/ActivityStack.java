@@ -1,4 +1,4 @@
-package com.zhang.library.utils.utils;
+package com.zhang.library.utils;
 
 import android.app.Activity;
 import android.app.Application;

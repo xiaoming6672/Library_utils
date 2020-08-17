@@ -1,9 +1,7 @@
-package com.zhang.library.utils.utils;
+package com.zhang.library.utils;
 
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.zhang.library.utils.BuildConfig;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
