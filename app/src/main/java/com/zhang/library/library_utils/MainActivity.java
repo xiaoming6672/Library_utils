@@ -3,8 +3,8 @@ package com.zhang.library.library_utils;
 import android.os.Bundle;
 import android.widget.ImageView;
 
-import com.zhang.library.utils.utils.context.ContextUtils;
-import com.zhang.library.utils.utils.context.GlideUtils;
+import com.zhang.library.utils.context.ContextUtils;
+import com.zhang.library.utils.context.GlideUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 

@@ -1,4 +1,4 @@
-package com.zhang.library.utils.utils.context;
+package com.zhang.library.utils.context;
 
 import android.content.Context;
 import android.content.res.Resources;

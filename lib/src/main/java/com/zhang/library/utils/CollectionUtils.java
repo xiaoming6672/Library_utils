@@ -1,4 +1,4 @@
-package com.zhang.library.utils.utils;
+package com.zhang.library.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
