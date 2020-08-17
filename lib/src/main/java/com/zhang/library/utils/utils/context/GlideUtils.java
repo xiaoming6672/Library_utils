@@ -64,6 +64,29 @@ public class GlideUtils extends ContextUtils {
     /**
      * 加载图片
      *
+     * @param url     图片链接地址
+     * @param options 加载参数
+     */
+    public static RequestBuilder<Drawable> load(Object url, RequestOptions options) {
+        return getGlide()
+                .load(url)
+                .apply(options);
+    }
+
+    /**
+     * 加载图片
+     *
+     * @param url     图片链接地址
+     * @param options 加载参数
+     * @param target  显示图片
+     */
+    public static void load(Object url, RequestOptions options, ImageView target) {
+        load(url, options).into(target);
+    }
+
+    /**
+     * 加载图片
+     *
      * @param url        图片链接地址
      * @param errorResId 加载失败图片
      * @param placeResId 默认图片
@@ -172,7 +195,7 @@ public class GlideUtils extends ContextUtils {
      * 加载圆角图片
      *
      * @param url    图片链接地址
-     * @param radius 圆角角度
+     * @param radius 圆角角度，单位像素
      */
     public static RequestBuilder<Drawable> loadRadiusImaage(Object url, int radius) {
         RequestOptions options = new RequestOptions()
@@ -189,7 +212,7 @@ public class GlideUtils extends ContextUtils {
      * 加载圆角图片
      *
      * @param url    图片链接地址
-     * @param radius 圆角角度
+     * @param radius 圆角角度，单位像素
      * @param target 显示图片
      */
     public static void loadRadiusImage(Object url, int radius, ImageView target) {
