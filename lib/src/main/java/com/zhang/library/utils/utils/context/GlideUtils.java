@@ -38,8 +38,8 @@ public class GlideUtils extends ContextUtils {
      */
     public static RequestBuilder<Drawable> load(Object url) {
         RequestOptions options = new RequestOptions()
-                .error(R.drawable.ic_no_image)
-                .placeholder(R.drawable.ic_no_image);
+                .error(R.mipmap.ic_no_image)
+                .placeholder(R.mipmap.ic_no_image);
 
         return getGlide()
                 .load(url)
@@ -147,8 +147,8 @@ public class GlideUtils extends ContextUtils {
         RequestOptions options = new RequestOptions()
                 .centerCrop()
                 .circleCrop()
-                .error(R.drawable.ic_no_image_round)
-                .placeholder(R.drawable.ic_no_image_round);
+                .error(R.mipmap.ic_no_image_round)
+                .placeholder(R.mipmap.ic_no_image_round);
 
         return getGlide()
                 .load(url)
@@ -172,8 +172,8 @@ public class GlideUtils extends ContextUtils {
      */
     public static RequestBuilder<GifDrawable> loadGif(Object url) {
         RequestOptions options = new RequestOptions()
-                .error(R.drawable.ic_no_image)
-                .placeholder(R.drawable.ic_no_image);
+                .error(R.mipmap.ic_no_image)
+                .placeholder(R.mipmap.ic_no_image);
 
         return getGlide()
                 .asGif()
@@ -199,8 +199,8 @@ public class GlideUtils extends ContextUtils {
      */
     public static RequestBuilder<Drawable> loadRadiusImaage(Object url, int radius) {
         RequestOptions options = new RequestOptions()
-                .error(R.drawable.ic_no_image)
-                .placeholder(R.drawable.ic_no_image)
+                .error(R.mipmap.ic_no_image)
+                .placeholder(R.mipmap.ic_no_image)
                 .transform(new RoundedCorners(radius));
 
         return getGlide()
