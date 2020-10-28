@@ -83,13 +83,28 @@ public class ResUtils extends ContextUtils {
     }
 
     /**
-     * 获得图片文件名对应的资源id
+     * 获得drawable图片文件名对应的资源id
      *
      * @param drawableName 资源id名字
      */
     public static int getIdentifierForDrawable(String drawableName) {
         try {
             return getResources().getIdentifier(drawableName, "drawable",
+                    get().getPackageName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 获得mipmap图片文件名对应的资源id
+     *
+     * @param mipmapName 资源id名字
+     */
+    public static int getIdentifierForMipMap(String mipmapName) {
+        try {
+            return getResources().getIdentifier(mipmapName, "mipmap",
                     get().getPackageName());
         } catch (Exception e) {
             e.printStackTrace();
