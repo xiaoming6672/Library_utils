@@ -21,6 +21,9 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
+
 /**
  * View 工具类
  *
@@ -974,6 +977,34 @@ public class ViewUtils extends ContextUtils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * 设置状态栏字体颜色
+     * <br>SDK版本21（5.0）以上才生效
+     *
+     * @param activity 当前Activity
+     * @param isDark   <b>true:</b>状态栏字体颜色白色<br>
+     *                 <b>false:</b>状态栏字体颜色黑色
+     */
+    public static void setStatusBarDark(Activity activity, boolean isDark) {
+        int flag = activity.getWindow().getDecorView().getSystemUiVisibility();
+        if (isDark) {
+            flag = addFlag(flag, FLAG_LAYOUT_IN_SCREEN);
+            flag = clearFlag(flag, FLAG_SECURE);
+        } else {
+            flag = addFlag(flag, FLAG_SECURE);
+            flag = clearFlag(flag, FLAG_LAYOUT_IN_SCREEN);
+        }
+        activity.getWindow().getDecorView().setSystemUiVisibility(flag);
+    }
+
+    private static int addFlag(int original, int flag) {
+        return original | flag;
+    }
+
+    private static int clearFlag(int original, int flag) {
+        return original & ~flag;
     }
 
     /**
