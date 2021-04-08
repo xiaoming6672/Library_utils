@@ -7,6 +7,8 @@ import android.os.Environment;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,7 +34,7 @@ public class FileUtils extends ContextUtils {
     }
 
     /** 获取外存路径 */
-    public static String getExternalStoreageDirectory() {
+    public static String getExternalStorageDirectory() {
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
             throw new RuntimeException("External storage state must be mounted!");
 
@@ -45,7 +47,7 @@ public class FileUtils extends ContextUtils {
      * @param type 指定的文件类型，例如 {@linkplain Environment#DIRECTORY_MOVIES}，{@linkplain
      *             Environment#DIRECTORY_MUSIC}等
      */
-    public static String getExternalStoreageDirectory(String type) {
+    public static String getExternalStorageDirectory(String type) {
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
             throw new RuntimeException("External storage state must be mounted!");
 
@@ -64,6 +66,38 @@ public class FileUtils extends ContextUtils {
         }
         return file.getParent();
     }
+
+    /**
+     * 复制单个文件      
+     *
+     * @param oldPath  String 原文件路径 如：data/video/xxx.mp4      
+     * @param newPath  String 复制后路径 如：data/oss/      
+     * @param fileName 文件名字 如：xxx.mp4
+     */
+    public static boolean copyFile(String oldPath, String newPath, String fileName) {
+        try {
+            int byteRead = 0;
+            File oldFile = new File(oldPath);
+            File newFile = new File(newPath);
+            if (!newFile.exists()) {
+                newFile.mkdirs();
+            }
+            if (oldFile.exists()) { //文件存在时
+                FileInputStream is = new FileInputStream(oldPath); //读入原文件
+                FileOutputStream os = new FileOutputStream(newPath + fileName);
+                byte[] buffer = new byte[1024];
+                while ((byteRead = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, byteRead);
+                }
+                is.close();
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     /**
      * 删除问阿金
