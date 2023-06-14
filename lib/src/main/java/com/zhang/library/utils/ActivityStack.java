@@ -19,6 +19,8 @@ import androidx.annotation.NonNull;
  */
 public class ActivityStack {
 
+    private static final String TAG = "ActivityStack";
+
     private static volatile ActivityStack instance;
 
     private Application mApplication;
@@ -53,15 +55,18 @@ public class ActivityStack {
     private final Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
         @Override
         public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
+            LogUtils.info(TAG, "%s>>>onCreate()", activity.getClass().getSimpleName());
             addActivity(activity);
         }
 
         @Override
         public void onActivityStarted(@NonNull Activity activity) {
+            LogUtils.info(TAG, "%s>>>onStart()", activity.getClass().getSimpleName());
         }
 
         @Override
         public void onActivityResumed(@NonNull Activity activity) {
+            LogUtils.info(TAG, "%s>>>onResume()", activity.getClass().getSimpleName());
             final int index = mActivityHolder.indexOf(activity);
             if (index < 0)
                 return;
@@ -72,30 +77,34 @@ public class ActivityStack {
 
             if (index != (size - 1)) {
                 if (isDebug)
-                    Log.e(ActivityStack.class.getSimpleName(), "start order activity " + activity + " old index " + index);
+                    Log.e(TAG, "start order activity " + activity + " old index " + index);
 
                 removeActivity(activity);
                 addActivity(activity);
 
                 if (isDebug)
-                    Log.e(ActivityStack.class.getSimpleName(), "end order activity " + activity + " new index " + mActivityHolder.indexOf(activity));
+                    Log.e(TAG, "end order activity " + activity + " new index " + mActivityHolder.indexOf(activity));
             }
         }
 
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
+            LogUtils.info(TAG, "%s>>>onPause()", activity.getClass().getSimpleName());
         }
 
         @Override
         public void onActivityStopped(@NonNull Activity activity) {
+            LogUtils.info(TAG, "%s>>>onStop()", activity.getClass().getSimpleName());
         }
 
         @Override
         public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+            LogUtils.info(TAG, "%s>>>onSaveInstanceState()", activity.getClass().getSimpleName());
         }
 
         @Override
         public void onActivityDestroyed(@NonNull Activity activity) {
+            LogUtils.info(TAG, "%s>>>onDestroy()", activity.getClass().getSimpleName());
             removeActivity(activity);
         }
     };
@@ -121,7 +130,7 @@ public class ActivityStack {
         mActivityHolder.add(activity);
 
         if (isDebug) {
-            Log.i(ActivityStack.class.getSimpleName(), "+++++ " + activity + " " + mActivityHolder.size()
+            Log.i(TAG, "+++++ " + activity + " " + mActivityHolder.size()
                     + "\r\n" + getCurrentStack());
         }
     }
@@ -134,7 +143,7 @@ public class ActivityStack {
     private void removeActivity(Activity activity) {
         if (mActivityHolder.remove(activity)) {
             if (isDebug) {
-                Log.e(ActivityStack.class.getSimpleName(), "----- " + activity + " " + mActivityHolder.size()
+                Log.e(TAG, "----- " + activity + " " + mActivityHolder.size()
                         + "\r\n" + getCurrentStack());
             }
         }

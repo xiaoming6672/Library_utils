@@ -19,30 +19,47 @@ public class JsonUtils {
     public static final Gson GSON;
 
     static {
-        GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        GSON = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
+//                .setPrettyPrinting()
+                .create();
     }
 
     private JsonUtils() {
     }
 
-    public static String objectToJson(Object object) {
+
+    public static String toJson(Object object) {
         return GSON.toJson(object);
     }
 
-    public static <T> T jsonToObject(String json, Type type) {
+    public static String toJson(Object object, Class<?> clazz) {
+        return GSON.toJson(object, clazz);
+    }
+
+
+    public static <T> T fromJson(String json, Type type) {
         return GSON.fromJson(json, type);
     }
 
-    public static <T> T mapToObject(Map map, Type type) {
+    public static <T> T fromJson(Gson gson, String json, Type type) {
+        if (gson == null)
+            return fromJson(json, type);
+
+        return gson.fromJson(json, type);
+    }
+
+
+    public static <T> T fromMap(Map map, Type type) {
         if (map == null) {
             return null;
         } else {
-            String json = objectToJson(map);
-            return jsonToObject(json, type);
+            String json = toJson(map);
+            return fromJson(json, type);
         }
     }
 
-    public static <T> List<T> jsonToList(String json) {
+    public static <T> List<T> toList(String json) {
         try {
             return GSON.fromJson(json, new TypeToken<List<T>>() {
             }.getType());
@@ -52,7 +69,7 @@ public class JsonUtils {
         return null;
     }
 
-    public static <T> Map<String, T> GsonToMaps(String gsonString) {
+    public static <T> Map<String, T> toMap(String gsonString) {
         return GSON.fromJson(gsonString, new TypeToken<Map<String, T>>() {
         }.getType());
     }

@@ -14,12 +14,44 @@ import java.util.Locale;
  */
 public final class LogUtils {
 
+    private static final String TAG = "LogUtils";
+
+    /** 是否打印日志 */
     private static boolean isDebug;
+    /** 是否打印追踪信息，输出打印日志的位置 */
+    private static boolean isTrack;
 
     private LogUtils() {
         isDebug = BuildConfig.DEBUG;
     }
 
+    /**
+     * 初始化
+     *
+     * @param debug 是否打印日志
+     */
+    public static void init(boolean debug) {
+        isDebug = debug;
+    }
+
+    /**
+     * 初始化
+     *
+     * @param debug 是否打印日志
+     * @param track 是否打印追踪信息
+     */
+    public static void init(boolean debug, boolean track) {
+        isDebug = debug;
+        isTrack = track;
+    }
+
+    /**
+     * 设置是否打印日志
+     *
+     * @param isDebug 是否打印日志
+     *
+     * @deprecated 改用 {@link #init(boolean)}或者{@link #init(boolean, boolean)}
+     */
     public static void setDebug(boolean isDebug) {
         LogUtils.isDebug = isDebug;
     }
@@ -45,6 +77,12 @@ public final class LogUtils {
     public static void verbose(String tag, String msg) {
         if (!isDebug)
             return;
+
+        if (!isTrack) {
+            Log.v(TextUtils.isEmpty(tag) ? TAG : tag, msg);
+            return;
+        }
+
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
             tag = getClassName(traceElements);
@@ -74,6 +112,12 @@ public final class LogUtils {
     public static void debug(String tag, String msg) {
         if (!isDebug)
             return;
+
+        if (!isTrack) {
+            Log.d(TextUtils.isEmpty(tag) ? TAG : tag, msg);
+            return;
+        }
+
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
             tag = getClassName(traceElements);
@@ -103,6 +147,12 @@ public final class LogUtils {
     public static void info(String tag, String msg) {
         if (!isDebug)
             return;
+
+        if (!isTrack) {
+            Log.i(TextUtils.isEmpty(tag) ? TAG : tag, msg);
+            return;
+        }
+
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
             tag = getClassName(traceElements);
@@ -126,18 +176,39 @@ public final class LogUtils {
 
     //<editor-fold desc="warn">
     public static void warn(String msg) {
-
+        warn(null, msg);
     }
 
     public static void warn(String tag, String msg) {
         if (!isDebug)
             return;
+
+        if (!isTrack) {
+            Log.w(TextUtils.isEmpty(tag) ? TAG : tag, msg);
+            return;
+        }
+
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
             tag = getClassName(traceElements);
         String log = createLog(traceElements, msg);
         Log.w(tag, log);
     }
+
+    public static void warn(String format, Object... args) {
+        warn(null, format, args);
+    }
+
+    public static void warn(String tag, String format, Object... args) {
+        String msg;
+        if (TextUtils.isEmpty(format))
+            msg = " ";
+        else
+            msg = args == null || args.length <= 0 ? format : String.format(Locale.US, format, args);
+
+        warn(tag, msg);
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="error">
@@ -148,6 +219,12 @@ public final class LogUtils {
     public static void error(String tag, String msg) {
         if (!isDebug)
             return;
+
+        if (!isTrack) {
+            Log.v(TextUtils.isEmpty(tag) ? TAG : tag, msg);
+            return;
+        }
+
         StackTraceElement[] traceElements = new Throwable().getStackTrace();
         if (TextUtils.isEmpty(tag))
             tag = getClassName(traceElements);
