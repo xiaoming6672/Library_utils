@@ -21,6 +21,13 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.zhang.library.utils.constant.ViewDirection;
+
+import java.lang.reflect.Field;
+
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
+
 import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 
@@ -246,6 +253,8 @@ public class ViewUtils extends ContextUtils {
         }
     }
 
+    //<editor-fold desc="Margin">
+
     /**
      * 获得指定view的 MarginLayoutParams
      *
@@ -378,6 +387,75 @@ public class ViewUtils extends ContextUtils {
             view.setLayoutParams(params);
         }
     }
+
+    /**
+     * 获取控件指定方向的Margin值
+     *
+     * @param view      控件
+     * @param direction 方向
+     */
+    public static int getMarginValue(View view, @ViewDirection int direction) {
+        MarginLayoutParams params = getMarginLayoutParams(view);
+        if (params == null)
+            return 0;
+
+        int value = 0;
+        switch (direction) {
+            case ViewDirection.LEFT:
+                value = params.leftMargin;
+                break;
+            case ViewDirection.TOP:
+                value = params.topMargin;
+                break;
+            case ViewDirection.RIGHT:
+                value = params.rightMargin;
+                break;
+            case ViewDirection.BOTTOM:
+                value = params.bottomMargin;
+                break;
+        }
+
+        return value;
+    }
+
+    /**
+     * 设置控件指定方向上的Margin值
+     *
+     * @param view      控件
+     * @param value     新的值
+     * @param direction 方向
+     */
+    public static void setMarginValue(View view, int value, @ViewDirection int direction) {
+        if (view == null)
+            return;
+
+        MarginLayoutParams params = getMarginLayoutParams(view);
+        if (params == null)
+            return;
+
+        switch (direction) {
+            case ViewDirection.LEFT:
+                if (params.leftMargin != value)
+                    params.leftMargin = value;
+                break;
+            case ViewDirection.TOP:
+                if (params.topMargin != value)
+                    params.topMargin = value;
+                break;
+            case ViewDirection.RIGHT:
+                if (params.rightMargin != value)
+                    params.rightMargin = value;
+                break;
+            case ViewDirection.BOTTOM:
+                if (params.bottomMargin != value)
+                    params.bottomMargin = value;
+                break;
+        }
+
+        view.setLayoutParams(params);
+    }
+
+    //</editor-fold>
 
     /**
      * 设置view内部四个方向的填充
@@ -1022,4 +1100,20 @@ public class ViewUtils extends ContextUtils {
 
         return (params.flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == WindowManager.LayoutParams.FLAG_FULLSCREEN;
     }
+
+    /** 降低ViewPager2的灵敏度 */
+    public static void desensitizeViewPager2(ViewPager2 viewPager2) {
+        try {
+            Field mRecyclerViewField = viewPager2.getClass().getDeclaredField("mRecyclerView");
+            mRecyclerViewField.setAccessible(true);
+            RecyclerView rv = (RecyclerView) mRecyclerViewField.get(viewPager2);
+            Field mTouchSlopField = RecyclerView.class.getDeclaredField("mTouchSlop");
+            mTouchSlopField.setAccessible(true);
+            int touchSlop = (int) mTouchSlopField.get(rv);
+            mTouchSlopField.set(rv, touchSlop * 3);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
