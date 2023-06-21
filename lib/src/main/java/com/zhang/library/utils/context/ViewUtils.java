@@ -1103,6 +1103,16 @@ public class ViewUtils extends ContextUtils {
 
     /** 降低ViewPager2的灵敏度 */
     public static void desensitizeViewPager2(ViewPager2 viewPager2) {
+        desensitizeViewPager2(viewPager2, 3);
+    }
+
+    /**
+     * 降低ViewPager2的灵敏度
+     *
+     * @param viewPager2 ViewPager2控件
+     * @param multiple   倍数
+     */
+    public static void desensitizeViewPager2(ViewPager2 viewPager2, int multiple) {
         try {
             Field mRecyclerViewField = viewPager2.getClass().getDeclaredField("mRecyclerView");
             mRecyclerViewField.setAccessible(true);
@@ -1110,7 +1120,11 @@ public class ViewUtils extends ContextUtils {
             Field mTouchSlopField = RecyclerView.class.getDeclaredField("mTouchSlop");
             mTouchSlopField.setAccessible(true);
             int touchSlop = (int) mTouchSlopField.get(rv);
-            mTouchSlopField.set(rv, touchSlop * 3);
+            mTouchSlopField.set(rv, touchSlop * multiple);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
