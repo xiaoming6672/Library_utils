@@ -24,11 +24,15 @@ public class ActivityStack {
     private static volatile ActivityStack instance;
 
     private Application mApplication;
-    private final List<Activity> mActivityHolder = new CopyOnWriteArrayList<>();
+    private final List<Activity> mActivityHolder;
+    /** 活跃数量 */
+    private int mActiveCount;
 
     private boolean isDebug;
 
     private ActivityStack() {
+        mActivityHolder = new CopyOnWriteArrayList<>();
+        mActiveCount = 0;
     }
 
     public static ActivityStack getInstance() {
@@ -66,6 +70,8 @@ public class ActivityStack {
 
         @Override
         public void onActivityResumed(@NonNull Activity activity) {
+            mActiveCount++;
+
             LogUtils.info(TAG, "%s>>>onResume()", activity.getClass().getSimpleName());
             final int index = mActivityHolder.indexOf(activity);
             if (index < 0)
@@ -90,6 +96,7 @@ public class ActivityStack {
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
             LogUtils.info(TAG, "%s>>>onPause()", activity.getClass().getSimpleName());
+            mActiveCount--;
         }
 
         @Override
@@ -147,6 +154,11 @@ public class ActivityStack {
                         + "\r\n" + getCurrentStack());
             }
         }
+    }
+
+    /** 获取活跃的页面的数量 */
+    public int getActiveCount() {
+        return mActiveCount;
     }
 
     /**
