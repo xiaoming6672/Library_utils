@@ -20,7 +20,7 @@ public class TimeUtils {
     /** 一天的毫秒数 */
     private static final int MILLISECOND_PER_DAY = 24 * 60 * 60 * 1000;
 
-    private static DateFormat mFormat = SimpleDateFormat.getInstance();
+    private static final DateFormat mFormat = SimpleDateFormat.getInstance();
 
     /**
      * 计算时间差
