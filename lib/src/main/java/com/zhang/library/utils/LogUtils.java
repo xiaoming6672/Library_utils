@@ -221,7 +221,7 @@ public final class LogUtils {
             return;
 
         if (!isTrack) {
-            Log.v(TextUtils.isEmpty(tag) ? TAG : tag, msg);
+            Log.e(TextUtils.isEmpty(tag) ? TAG : tag, msg);
             return;
         }
 
