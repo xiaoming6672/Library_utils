@@ -4,6 +4,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
@@ -15,9 +18,6 @@ import com.bumptech.glide.request.transition.Transition;
 import com.zhang.library.utils.R;
 
 import java.io.File;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 /**
  * 图片加载工具
@@ -81,7 +81,10 @@ public class GlideUtils extends ContextUtils {
      * @param target  显示图片
      */
     public static void load(Object url, RequestOptions options, ImageView target) {
-        load(url, options).into(target);
+        Glide.with(target)
+                .load(url)
+                .apply(options)
+                .into(target);
     }
 
     /**
@@ -108,7 +111,14 @@ public class GlideUtils extends ContextUtils {
      * @param target 显示图片
      */
     public static void load(Object url, ImageView target) {
-        load(url).into(target);
+        RequestOptions options = new RequestOptions()
+                .error(R.mipmap.ic_no_image)
+                .placeholder(R.mipmap.ic_no_image);
+
+        Glide.with(target)
+                .load(url)
+                .apply(options)
+                .into(target);
     }
 
     /**
@@ -128,7 +138,8 @@ public class GlideUtils extends ContextUtils {
      * @param target 显示图片
      */
     public static void download(Object url, final ImageView target) {
-        download(url)
+        Glide.with(target)
+                .download(url)
                 .into(new SimpleTarget<File>() {
                     @Override
                     public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
@@ -162,7 +173,16 @@ public class GlideUtils extends ContextUtils {
      * @param target 显示图片
      */
     public static void loadHead(Object url, ImageView target) {
-        loadHead(url).into(target);
+        RequestOptions options = new RequestOptions()
+                .centerCrop()
+                .circleCrop()
+                .error(R.mipmap.ic_no_image_round)
+                .placeholder(R.mipmap.ic_no_image_round);
+
+        Glide.with(target)
+                .load(url)
+                .apply(options)
+                .into(target);
     }
 
     /**
@@ -188,7 +208,15 @@ public class GlideUtils extends ContextUtils {
      * @param target 显示gif图片
      */
     public static void loadGif(Object url, ImageView target) {
-        loadGif(url).into(target);
+        RequestOptions options = new RequestOptions()
+                .error(R.mipmap.ic_no_image)
+                .placeholder(R.mipmap.ic_no_image);
+
+        Glide.with(target)
+                .asGif()
+                .load(url)
+                .apply(options)
+                .into(target);
     }
 
     /**
@@ -197,7 +225,7 @@ public class GlideUtils extends ContextUtils {
      * @param url    图片链接地址
      * @param radius 圆角角度，单位像素
      */
-    public static RequestBuilder<Drawable> loadRadiusImaage(Object url, int radius) {
+    public static RequestBuilder<Drawable> loadRadiusImage(Object url, int radius) {
         RequestOptions options = new RequestOptions()
                 .error(R.mipmap.ic_no_image)
                 .placeholder(R.mipmap.ic_no_image)
@@ -216,6 +244,14 @@ public class GlideUtils extends ContextUtils {
      * @param target 显示图片
      */
     public static void loadRadiusImage(Object url, int radius, ImageView target) {
-        loadRadiusImaage(url, radius).into(target);
+        RequestOptions options = new RequestOptions()
+                .error(R.mipmap.ic_no_image)
+                .placeholder(R.mipmap.ic_no_image)
+                .transform(new RoundedCorners(radius));
+
+        Glide.with(target)
+                .load(url)
+                .apply(options)
+                .into(target);
     }
 }
