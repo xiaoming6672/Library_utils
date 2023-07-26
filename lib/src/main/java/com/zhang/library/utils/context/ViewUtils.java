@@ -1,8 +1,12 @@
 package com.zhang.library.utils.context;
 
+import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -21,15 +25,13 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.zhang.library.utils.constant.ViewDirection;
-
-import java.lang.reflect.Field;
-
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
+import com.zhang.library.utils.constant.ViewDirection;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * View 工具类
@@ -40,6 +42,9 @@ public class ViewUtils extends ContextUtils {
 
     private ViewUtils() {
     }
+
+
+    //<editor-fold desc="显示/隐藏">
 
     /**
      * 设置View是否显示
@@ -74,6 +79,91 @@ public class ViewUtils extends ContextUtils {
     }
 
     /**
+     * 设置view的可见状态
+     *
+     * @param view       指定的view
+     * @param visibility 可见状态
+     *
+     * @return true-view处于设置的状态
+     */
+    public static boolean setVisibility(View view, int visibility) {
+        if (view == null)
+            return false;
+
+        if (visibility == View.VISIBLE ||
+                visibility == View.INVISIBLE ||
+                visibility == View.GONE) {
+            if (view.getVisibility() != visibility)
+                view.setVisibility(visibility);
+            return true;
+        } else {
+            throw new IllegalArgumentException("visibility is Illegal");
+        }
+    }
+
+    /**
+     * 设置view在VISIBLE和GONE之间切换
+     *
+     * @param view 指定的view
+     *
+     * @return true-view处于VISIBLE
+     */
+    public static boolean toggleVisibleOrGone(View view) {
+        if (view == null)
+            return false;
+
+        if (view.getVisibility() == View.VISIBLE) {
+            if (view.getVisibility() != View.GONE)
+                view.setVisibility(View.GONE);
+            return false;
+        } else {
+            if (view.getVisibility() != View.VISIBLE)
+                view.setVisibility(View.VISIBLE);
+            return true;
+        }
+    }
+
+    /**
+     * 设置view在VISIBLE和INVISIBLE之间切换
+     *
+     * @param view 指定的view
+     *
+     * @return true-view处于VISIBLE
+     */
+    public static boolean toggleVisibleOrInvisible(View view) {
+        if (view == null)
+            return false;
+
+        if (view.getVisibility() == View.VISIBLE) {
+            if (view.getVisibility() != View.INVISIBLE)
+                view.setVisibility(View.INVISIBLE);
+            return false;
+        } else {
+            if (view.getVisibility() != View.VISIBLE)
+                view.setVisibility(View.VISIBLE);
+            return true;
+        }
+    }
+    //</editor-fold>
+
+
+    //<editor-fold desc="宽高">
+
+    /**
+     * 测量view，测量后，可以获得view的测量宽高
+     *
+     * @param view view
+     */
+    public static void measureView(View view) {
+        if (view == null)
+            return;
+
+        final int w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        final int h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        view.measure(w, h);
+    }
+
+    /**
      * 获得view的宽度
      *
      * @param view view
@@ -91,46 +181,6 @@ public class ViewUtils extends ContextUtils {
             width = view.getMeasuredWidth();
         }
         return width;
-    }
-
-    /**
-     * 设置view的宽度
-     *
-     * @param view  view
-     * @param width 宽度
-     *
-     * @return true-view的高度和指定的高度的一致
-     */
-    public static boolean setWidth(View view, int width) {
-        final LayoutParams params = view.getLayoutParams();
-        if (params != null) {
-            if (params.width != width) {
-                params.width = width;
-                view.setLayoutParams(params);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 设置view的高度
-     *
-     * @param view   view
-     * @param height 高度
-     *
-     * @return true-view的高度和指定的高度的一致
-     */
-    public static boolean setHeight(View view, int height) {
-        final LayoutParams params = view.getLayoutParams();
-        if (params != null) {
-            if (params.height != height) {
-                params.height = height;
-                view.setLayoutParams(params);
-            }
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -153,20 +203,207 @@ public class ViewUtils extends ContextUtils {
         return height;
     }
 
+    /**
+     * 设置view的宽度
+     *
+     * @param view  view
+     * @param width 宽度
+     */
+    public static void setWidth(View view, int width) {
+        final LayoutParams params = view.getLayoutParams();
+        if (params != null) {
+            if (params.width != width) {
+                params.width = width;
+                view.setLayoutParams(params);
+            }
+        }
+    }
 
     /**
-     * 测量view，测量后，可以获得view的测量宽高
+     * 设置view的高度
      *
-     * @param view view
+     * @param view   view
+     * @param height 高度
      */
-    public static void measureView(View view) {
+    public static void setHeight(View view, int height) {
+        final LayoutParams params = view.getLayoutParams();
+        if (params != null) {
+            if (params.height != height) {
+                params.height = height;
+                view.setLayoutParams(params);
+            }
+        }
+    }
+
+    /**
+     * 设置view的宽度和高度
+     *
+     * @param view   指定的view
+     * @param width  指定的宽度
+     * @param height 指定的高度
+     */
+    public static boolean setSize(View view, int width, int height) {
+        final ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (params != null) {
+            boolean needSet = false;
+            if (params.width != width) {
+                params.width = width;
+                needSet = true;
+            }
+            if (params.height != height) {
+                params.height = height;
+                needSet = true;
+            }
+
+            if (needSet)
+                view.setLayoutParams(params);
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 根据传入的宽度，获得按指定比例缩放后的高度
+     *
+     * @param scaleWidth  指定的比例宽度
+     * @param scaleHeight 指定的比例高度
+     * @param width       宽度
+     */
+    public static int getScaleHeight(int scaleWidth, int scaleHeight, int width) {
+        if (scaleWidth == 0)
+            return 0;
+
+        return scaleHeight * width / scaleWidth;
+    }
+
+    /**
+     * 根据传入的高度，获得按指定比例缩放后的宽度
+     *
+     * @param scaleWidth  指定的比例宽度
+     * @param scaleHeight 指定的比例高度
+     * @param height      高度
+     */
+    public static int getScaleWidth(int scaleWidth, int scaleHeight, int height) {
+        if (scaleHeight == 0)
+            return 0;
+
+        return scaleWidth * height / scaleHeight;
+    }
+
+    /**
+     * 设置view的宽度为WRAP_CONTENT
+     *
+     * @param view 指定的view
+     */
+    public static void setWidthWrapContent(View view) {
+        setWidth(view, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    /**
+     * 设置view的宽度为MATCH_PARENT
+     *
+     * @param view 指定的view
+     */
+    public static void setWidthMatchParent(View view) {
+        setWidth(view, ViewGroup.LayoutParams.MATCH_PARENT);
+    }
+
+    /**
+     * 设置view的高度为WRAP_CONTENT
+     *
+     * @param view 指定的view
+     */
+    public static void setHeightWrapContent(View view) {
+        setHeight(view, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    /**
+     * 设置view的高度为MATCH_PARENT
+     *
+     * @param view 指定的view
+     */
+    public static void setHeightMatchParent(View view) {
+        setHeight(view, ViewGroup.LayoutParams.MATCH_PARENT);
+    }
+
+    /**
+     * 设置view的宽度和weight，仅当view处于LinearLayout里面时有效
+     *
+     * @param view   指定的view
+     * @param width  宽度
+     * @param weight 权重
+     */
+    public static void setWidthWeight(View view, int width, float weight) {
         if (view == null)
             return;
 
-        final int w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        final int h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        view.measure(w, h);
+        final ViewGroup.LayoutParams p = view.getLayoutParams();
+        if (p instanceof LinearLayout.LayoutParams) {
+            final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) p;
+
+            boolean needSet = false;
+            if (params.width != width) {
+                params.width = width;
+                needSet = true;
+            }
+            if (params.weight != weight) {
+                params.weight = weight;
+                needSet = true;
+            }
+
+            if (needSet)
+                view.setLayoutParams(params);
+        }
     }
+
+    /**
+     * 设置view的高度和weight，仅当view处于LinearLayout里面时有效
+     *
+     * @param view   指定的view
+     * @param height 高度
+     * @param weight 权重
+     */
+    public static void setHeightWeight(View view, int height, float weight) {
+        if (view == null)
+            return;
+
+        final ViewGroup.LayoutParams p = view.getLayoutParams();
+        if (p instanceof LinearLayout.LayoutParams) {
+            final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) p;
+
+            boolean needSet = false;
+            if (params.height != height) {
+                params.height = height;
+                needSet = true;
+            }
+            if (params.weight != weight) {
+                params.weight = weight;
+                needSet = true;
+            }
+
+            if (needSet)
+                view.setLayoutParams(params);
+        }
+    }
+
+    /**
+     * 测量文字的宽度
+     *
+     * @param textView 指定的TextView
+     * @param content  文字内容
+     */
+    public static float measureText(TextView textView, String content) {
+        if (textView == null || content == null)
+            return 0;
+
+        return textView.getPaint().measureText(content);
+    }
+
+    //</editor-fold>
+
+
+    //<editor-fold desc="ViewGroup子控件操作">
 
     /**
      * 添加子控件
@@ -178,6 +415,13 @@ public class ViewUtils extends ContextUtils {
         addView(parent, child, false);
     }
 
+    /**
+     * 添加子控件
+     *
+     * @param parent        父控件
+     * @param child         子控件
+     * @param removeAllView 是否移除其他的子控件
+     */
     public static void addView(View parent, View child, final boolean removeAllView) {
         if (parent == null || child == null)
             return;
@@ -215,7 +459,7 @@ public class ViewUtils extends ContextUtils {
     }
 
     /**
-     * 替换显示，其他所有字控件隐藏
+     * 替换显示，其他所有子控件隐藏
      *
      * @param parent 父控件
      * @param child  子控件
@@ -252,6 +496,8 @@ public class ViewUtils extends ContextUtils {
         } catch (Exception ignore) {
         }
     }
+    //</editor-fold>
+
 
     //<editor-fold desc="Margin">
 
@@ -457,6 +703,9 @@ public class ViewUtils extends ContextUtils {
 
     //</editor-fold>
 
+
+    //<editor-fold desc="Padding">
+
     /**
      * 设置view内部四个方向的填充
      *
@@ -539,62 +788,10 @@ public class ViewUtils extends ContextUtils {
 
         view.setPadding(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), bottom);
     }
+    //</editor-fold>
 
-    /**
-     * 根据传入的宽度，获得按指定比例缩放后的高度
-     *
-     * @param scaleWidth  指定的比例宽度
-     * @param scaleHeight 指定的比例高度
-     * @param width       宽度
-     */
-    public static int getScaleHeight(int scaleWidth, int scaleHeight, int width) {
-        if (scaleWidth == 0)
-            return 0;
 
-        return scaleHeight * width / scaleWidth;
-    }
-
-    /**
-     * 根据传入的高度，获得按指定比例缩放后的宽度
-     *
-     * @param scaleWidth  指定的比例宽度
-     * @param scaleHeight 指定的比例高度
-     * @param height      高度
-     */
-    public static int getScaleWidth(int scaleWidth, int scaleHeight, int height) {
-        if (scaleHeight == 0)
-            return 0;
-
-        return scaleWidth * height / scaleHeight;
-    }
-
-    /**
-     * 设置view的宽度和高度
-     *
-     * @param view   指定的view
-     * @param width  指定的宽度
-     * @param height 指定的高度
-     */
-    public static boolean setSize(View view, int width, int height) {
-        final ViewGroup.LayoutParams params = view.getLayoutParams();
-        if (params != null) {
-            boolean needSet = false;
-            if (params.width != width) {
-                params.width = width;
-                needSet = true;
-            }
-            if (params.height != height) {
-                params.height = height;
-                needSet = true;
-            }
-
-            if (needSet)
-                view.setLayoutParams(params);
-
-            return true;
-        }
-        return false;
-    }
+    //<editor-fold desc="RelativeLayout规则">
 
     /**
      * 当view的父布局是RelativeLayout的时候，设置view的布局规则
@@ -642,73 +839,10 @@ public class ViewUtils extends ContextUtils {
             view.setLayoutParams(params);
         }
     }
+    //</editor-fold>
 
-    /**
-     * 设置view的可见状态
-     *
-     * @param view       指定的view
-     * @param visibility 可见状态
-     *
-     * @return true-view处于设置的状态
-     */
-    public static boolean setVisibility(View view, int visibility) {
-        if (view == null)
-            return false;
 
-        if (visibility == View.VISIBLE ||
-                visibility == View.INVISIBLE ||
-                visibility == View.GONE) {
-            if (view.getVisibility() != visibility)
-                view.setVisibility(visibility);
-            return true;
-        } else {
-            throw new IllegalArgumentException("visibility is Illegal");
-        }
-    }
-
-    /**
-     * 设置view在VISIBLE和GONE之间切换
-     *
-     * @param view 指定的view
-     *
-     * @return true-view处于VISIBLE
-     */
-    public static boolean toggleVisibleOrGone(View view) {
-        if (view == null)
-            return false;
-
-        if (view.getVisibility() == View.VISIBLE) {
-            if (view.getVisibility() != View.GONE)
-                view.setVisibility(View.GONE);
-            return false;
-        } else {
-            if (view.getVisibility() != View.VISIBLE)
-                view.setVisibility(View.VISIBLE);
-            return true;
-        }
-    }
-
-    /**
-     * 设置view在VISIBLE和INVISIBLE之间切换
-     *
-     * @param view 指定的view
-     *
-     * @return true-view处于VISIBLE
-     */
-    public static boolean toggleVisibleOrInvisible(View view) {
-        if (view == null)
-            return false;
-
-        if (view.getVisibility() == View.VISIBLE) {
-            if (view.getVisibility() != View.INVISIBLE)
-                view.setVisibility(View.INVISIBLE);
-            return false;
-        } else {
-            if (view.getVisibility() != View.VISIBLE)
-                view.setVisibility(View.VISIBLE);
-            return true;
-        }
-    }
+    //<editor-fold desc="控件坐标点">
 
     /**
      * 获取View的中心横坐标
@@ -736,20 +870,20 @@ public class ViewUtils extends ContextUtils {
         return view.getY() + 1F * getHeight(view) / 2 + ResUtils.getStatusBarHeight();
     }
 
+    /** 获取控件在屏幕中的横向中心点 */
+    public static int getViewCenterXOnScreen(View view) {
+        int[] location = new int[2];
 
-    /**
-     * view是否被添加到界面上
-     *
-     * @param view 指定的view
-     */
-    public static boolean isAttached(View view) {
-        if (view == null)
-            return false;
+        view.getLocationOnScreen(location);
+        return location[0] + view.getWidth() / 2;
+    }
 
-        if (Build.VERSION.SDK_INT >= 19)
-            return view.isAttachedToWindow();
-        else
-            return view.getWindowToken() != null;
+    /** 获取控件在屏幕中的纵向中心点 */
+    public static int getViewCenterYOnScreen(View view) {
+        int[] location = new int[2];
+
+        view.getLocationOnScreen(location);
+        return location[1] + view.getHeight() / 2;
     }
 
     /**
@@ -799,8 +933,7 @@ public class ViewUtils extends ContextUtils {
         final int right = left + view.getWidth();
         final int bottom = top + view.getHeight();
 
-        return left < right && top < bottom
-                && x >= left && x < right && y >= top && y < bottom;
+        return x >= left && x < right && y >= top && y < bottom;
     }
 
     /**
@@ -818,6 +951,25 @@ public class ViewUtils extends ContextUtils {
 
         return outLocation;
     }
+
+    //</editor-fold>
+
+
+    /**
+     * view是否被添加到界面上
+     *
+     * @param view 指定的view
+     */
+    public static boolean isAttached(View view) {
+        if (view == null)
+            return false;
+
+        if (Build.VERSION.SDK_INT >= 19)
+            return view.isAttachedToWindow();
+        else
+            return view.getWindowToken() != null;
+    }
+
 
     /**
      * 获得view的截图
@@ -858,6 +1010,11 @@ public class ViewUtils extends ContextUtils {
         return imageView;
     }
 
+    /**
+     * 包裹PopupWindow
+     *
+     * @param pop PopupWindow
+     */
     public static void wrapperPopupWindow(PopupWindow pop) {
         if (pop == null)
             return;
@@ -870,101 +1027,8 @@ public class ViewUtils extends ContextUtils {
         pop.setOutsideTouchable(true);
     }
 
-    /**
-     * 设置view的宽度为WRAP_CONTENT
-     *
-     * @param view 指定的view
-     */
-    public static void setWidthWrapContent(View view) {
-        setWidth(view, ViewGroup.LayoutParams.WRAP_CONTENT);
-    }
 
-    /**
-     * 设置view的宽度为MATCH_PARENT
-     *
-     * @param view 指定的view
-     */
-    public static void setWidthMatchParent(View view) {
-        setWidth(view, ViewGroup.LayoutParams.MATCH_PARENT);
-    }
-
-    /**
-     * 设置view的高度为WRAP_CONTENT
-     *
-     * @param view 指定的view
-     */
-    public static void setHeightWrapContent(View view) {
-        setHeight(view, ViewGroup.LayoutParams.WRAP_CONTENT);
-    }
-
-    /**
-     * 设置view的高度为MATCH_PARENT
-     *
-     * @param view 指定的view
-     */
-    public static void setHeightMatchParent(View view) {
-        setHeight(view, ViewGroup.LayoutParams.MATCH_PARENT);
-    }
-
-    /**
-     * 设置view的宽度和weight，仅当view处于LinearLayout里面时有效
-     *
-     * @param view   指定的view
-     * @param width  宽度
-     * @param weight 权重
-     */
-    public static void setWidthWeight(View view, int width, float weight) {
-        if (view == null)
-            return;
-
-        final ViewGroup.LayoutParams p = view.getLayoutParams();
-        if (p instanceof LinearLayout.LayoutParams) {
-            final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) p;
-
-            boolean needSet = false;
-            if (params.width != width) {
-                params.width = width;
-                needSet = true;
-            }
-            if (params.weight != weight) {
-                params.weight = weight;
-                needSet = true;
-            }
-
-            if (needSet)
-                view.setLayoutParams(params);
-        }
-    }
-
-    /**
-     * 设置view的高度和weight，仅当view处于LinearLayout里面时有效
-     *
-     * @param view   指定的view
-     * @param height 高度
-     * @param weight 权重
-     */
-    public static void setHeightWeight(View view, int height, float weight) {
-        if (view == null)
-            return;
-
-        final ViewGroup.LayoutParams p = view.getLayoutParams();
-        if (p instanceof LinearLayout.LayoutParams) {
-            final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) p;
-
-            boolean needSet = false;
-            if (params.height != height) {
-                params.height = height;
-                needSet = true;
-            }
-            if (params.weight != weight) {
-                params.weight = weight;
-                needSet = true;
-            }
-
-            if (needSet)
-                view.setLayoutParams(params);
-        }
-    }
+    //<editor-fold desc="帧动画">
 
     /**
      * 开始动画Drawable
@@ -1001,6 +1065,7 @@ public class ViewUtils extends ContextUtils {
             animationDrawable.selectDrawable(stopIndex);
         }
     }
+    //</editor-fold>
 
     /**
      * 重置view
@@ -1021,41 +1086,134 @@ public class ViewUtils extends ContextUtils {
         view.setScaleY(1.0f);
     }
 
-    /**
-     * 测量文字的宽度
-     *
-     * @param textView 指定的TextView
-     * @param content  文字内容
-     */
-    public static float measureText(TextView textView, String content) {
-        if (textView == null || content == null)
-            return 0;
 
-        return textView.getPaint().measureText(content);
-    }
+    //<editor-fold desc="StatusBar">
 
     /**
      * 设置状态栏背景透明
      *
-     * @param activity    当前Activity界面
-     * @param transparent true-透明，false不透明
+     * @param activity 当前Activity界面
      */
-    public static boolean setStatusBarTransparent(Activity activity, boolean transparent) {
-        try {
+    public static void setStatusBarTransparent(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = activity.getWindow();
-            WindowManager.LayoutParams params = window.getAttributes();
-            final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-            if (transparent) {
-                params.flags |= bits;
-            } else {
-                params.flags &= ~bits;
-            }
-            window.setAttributes(params);
-            return true;
-        } catch (Exception e) {
-            return false;
+            View decorView = window.getDecorView();
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(option);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        } else {
+            Window window = activity.getWindow();
+            WindowManager.LayoutParams attributes = window.getAttributes();
+            int flagTranslucentStatus = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+            attributes.flags |= flagTranslucentStatus;
+            window.setAttributes(attributes);
         }
     }
+
+    /**
+     * 设置状态栏文字颜色
+     *
+     * @param activity 页面
+     * @param isDark   是否黑色字色
+     */
+    public static void setStatusBarTextColor(Activity activity, boolean isDark) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Window window = activity.getWindow();
+            View decorView = window.getDecorView();
+            int option = decorView.getSystemUiVisibility();
+            if (isDark) {
+                decorView.setSystemUiVisibility(option | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                decorView.setSystemUiVisibility(option & (~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+            }
+
+            setMIUIStatusBarLightMode(activity, isDark);
+            //LogUtils.test("option:" + decorView.getSystemUiVisibility());
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            boolean isFlymeSet = setFlymeStatusBarLightMode(activity.getWindow(), isDark);
+
+            if (!isFlymeSet)
+                setMIUIStatusBarLightMode(activity, isDark);
+        }
+    }
+
+    /**
+     * 设置小米系统状态栏文字颜色
+     *
+     * @param activity 页面
+     * @param dark     是否黑色
+     */
+    public static boolean setMIUIStatusBarLightMode(Activity activity, boolean dark) {
+        boolean result = false;
+        Window window = activity.getWindow();
+        if (window != null) {
+            Class<?> clazz = window.getClass();
+            try {
+                int darkModeFlag = 0;
+                Class<?> layoutParams = Class.forName("android.view.MiuiWindowManager$LayoutParams");
+                Field field = layoutParams.getField("EXTRA_FLAG_STATUS_BAR_DARK_MODE");
+                darkModeFlag = field.getInt(layoutParams);
+                Method extraFlagField = clazz.getMethod("setExtraFlags", int.class, int.class);
+                if (dark) {
+                    extraFlagField.invoke(window, darkModeFlag, darkModeFlag);//状态栏透明且黑色字体
+                } else {
+                    extraFlagField.invoke(window, 0, darkModeFlag);//清除黑色字体
+                }
+                result = true;
+
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                    //开发版 7.7.13 及以后版本采用了系统API，旧方法无效但不会报错，所以两个方式都要加上
+//                    if(dark){
+//                        activity.getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN| View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+//                    }else {
+//                        activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+//                    }
+//                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 设置状态栏图标为深色和魅族特定的文字风格 可以用来判断是否为Flyme用户
+     *
+     * @param window 需要设置的窗口
+     * @param dark   是否把状态栏文字及图标颜色设置为深色
+     *
+     * @return boolean 成功执行返回true
+     */
+    public static boolean setFlymeStatusBarLightMode(Window window, boolean dark) {
+        boolean result = false;
+        if (window != null) {
+            try {
+                WindowManager.LayoutParams lp = window.getAttributes();
+                Field darkFlag = WindowManager.LayoutParams.class
+                        .getDeclaredField("MEIZU_FLAG_DARK_STATUS_BAR_ICON");
+                Field meizuFlags = WindowManager.LayoutParams.class
+                        .getDeclaredField("meizuFlags");
+                darkFlag.setAccessible(true);
+                meizuFlags.setAccessible(true);
+                int bit = darkFlag.getInt(null);
+                int value = meizuFlags.getInt(lp);
+                if (dark) {
+                    value |= bit;
+                } else {
+                    value &= ~bit;
+                }
+                meizuFlags.setInt(lp, value);
+                window.setAttributes(lp);
+                result = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
 
     /**
      * 设置状态栏字体颜色
@@ -1085,6 +1243,37 @@ public class ViewUtils extends ContextUtils {
         return original & ~flag;
     }
 
+    /** 适应沉浸式状态栏，在顶部添加状态栏高度的paddingTop */
+    public static void fitsSystemWindowsByPaddingTop(View view) {
+        if (view == null) {
+            return;
+        }
+
+        int statusBarHeight = ResUtils.getStatusBarHeight();
+        int left = view.getPaddingLeft();
+        int top = view.getPaddingTop() + statusBarHeight;
+        int right = view.getPaddingRight();
+        int bottom = view.getPaddingBottom();
+
+        view.setPadding(left, top, right, bottom);
+    }
+
+    /** 适应沉浸式状态栏，在顶部添加状态栏高度的marginTop */
+    public static void fitsSystemWindowsByMarginTop(View view) {
+        if (view == null)
+            return;
+
+        int top = 0;
+        ViewGroup.MarginLayoutParams params = ViewUtils.getMarginLayoutParams(view);
+        if (params != null)
+            top += params.topMargin;
+
+        int statusBarHeight = ResUtils.getStatusBarHeight();
+        top += statusBarHeight;
+        ViewUtils.setMarginTop(view, top);
+    }
+
+
     /**
      * 是否全屏
      *
@@ -1100,6 +1289,10 @@ public class ViewUtils extends ContextUtils {
 
         return (params.flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == WindowManager.LayoutParams.FLAG_FULLSCREEN;
     }
+    //</editor-fold>
+
+
+    //<editor-fold desc="降低ViewPager2的灵敏度">
 
     /** 降低ViewPager2的灵敏度 */
     public static void desensitizeViewPager2(ViewPager2 viewPager2) {
@@ -1129,5 +1322,6 @@ public class ViewUtils extends ContextUtils {
             e.printStackTrace();
         }
     }
+    //</editor-fold>
 
 }
