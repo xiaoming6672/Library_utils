@@ -20,48 +20,60 @@ public class TimeUtils {
     /** 一天的毫秒数 */
     private static final int MILLISECOND_PER_DAY = 24 * 60 * 60 * 1000;
 
-    private static final DateFormat mFormat = SimpleDateFormat.getInstance();
+    private static final DateFormat mFormat;
+
+    static {
+        mFormat = SimpleDateFormat.getInstance();
+    }
 
     /**
      * 计算时间差
      *
-     * @param time 时间
+     * @param targetTime 时间
      */
-    public static String calculateTimeDifference(String time) {
+    public static String calculateTimeDifference(String targetTime) {
 
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         try {
-            Date topic_post_time = sdf1.parse(time);
-            Date currenTime = new Date(System.currentTimeMillis());
+            Date targetDate = null;
+            try {
+                targetDate = sdf1.parse(targetTime);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (targetDate == null)
+                targetDate = new Date();
 
-            long diff = Math.abs(currenTime.getTime() - topic_post_time.getTime());
-            long days = diff / (1000 * 60 * 60 * 24);
-            diff -= days * (1000 * 60 * 60 * 24);
-            long hours = diff / (1000 * 60 * 60);
-            diff -= hours * (1000 * 60 * 60);
-            long minutes = diff / (1000 * 60);
-            diff -= minutes * (1000 * 60);
+            Date currentDate = new Date(System.currentTimeMillis());
+
+            long diff = Math.abs(currentDate.getTime() - targetDate.getTime()); //时间差，单位：毫秒
+            long days = diff / (1000 * 60 * 60 * 24);   //计算时间差的天数
+            diff -= days * (1000 * 60 * 60 * 24);       //扣除天数后剩余的时间
+            long hours = diff / (1000 * 60 * 60);       //计算时间差的小时数
+            diff -= hours * (1000 * 60 * 60);           //扣除小时数后的时间
+            long minutes = diff / (1000 * 60);          //计算时间差的分钟数
+            diff -= minutes * (1000 * 60);              //扣除分钟数后的时间
             //            long seconds = diff / 1000;
             if (days >= 7) {
-                buffer.replace(0, buffer.length(), sdf2.format(topic_post_time));
+                builder.replace(0, builder.length(), sdf2.format(targetDate));
             } else {
                 if (days > 0) {
-                    buffer.append(days).append("天前");
+                    builder.append(days).append("天前");
                 } else {
                     if (hours > 0) {
-                        buffer.append(hours).append("小时前");
+                        builder.append(hours).append("小时前");
                     } else {
                         if (minutes > 0) {
-                            buffer.append(minutes).append("分前");
+                            builder.append(minutes).append("分前");
                         } else {
-                            buffer.append("刚刚");
+                            builder.append("刚刚");
                         }
                     }
                 }
             }
-            return buffer.toString();
+            return builder.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }

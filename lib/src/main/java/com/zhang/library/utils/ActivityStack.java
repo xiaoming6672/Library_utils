@@ -3,14 +3,13 @@ package com.zhang.library.utils;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import androidx.annotation.NonNull;
 
 /**
  * Activity队列
@@ -28,10 +27,15 @@ public class ActivityStack {
     /** 活跃数量 */
     private int mActiveCount;
 
-    private boolean isDebug;
+    /** App切换到后台的时间戳 */
+    private long mApplicationHiddenTimestamp;
+    /** App是否切换到后台 */
+    private boolean isApplicationHidden;
+    private final List<ApplicationStateChangedCallback> mCallbackList;
 
     private ActivityStack() {
         mActivityHolder = new CopyOnWriteArrayList<>();
+        mCallbackList = new ArrayList<>();
         mActiveCount = 0;
     }
 
@@ -45,10 +49,6 @@ public class ActivityStack {
         return instance;
     }
 
-    public void setDebug(boolean debug) {
-        isDebug = debug;
-    }
-
     public synchronized void init(Application application) {
         if (mApplication == null) {
             mApplication = application;
@@ -56,6 +56,31 @@ public class ActivityStack {
         }
     }
 
+
+    /**
+     * 注册Application状态变更回调
+     *
+     * @param callback 回调
+     */
+    public void registerApplicationStateChangedCallback(ApplicationStateChangedCallback callback) {
+        if (callback == null)
+            return;
+
+        if (!mCallbackList.contains(callback))
+            mCallbackList.add(callback);
+    }
+
+    /**
+     * 注销Application状态变更回调
+     *
+     * @param callback 回调
+     */
+    public void unregisterApplicationStateChangedCallback(ApplicationStateChangedCallback callback) {
+        mCallbackList.remove(callback);
+    }
+
+
+    /** Application的Activity生命周期回调 */
     private final Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
         @Override
         public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
@@ -72,6 +97,17 @@ public class ActivityStack {
         public void onActivityResumed(@NonNull Activity activity) {
             mActiveCount++;
 
+            if (isApplicationHidden) {
+                isApplicationHidden = false;
+
+                long nowTime = System.currentTimeMillis();
+                long hiddenDuration = nowTime - mApplicationHiddenTimestamp;
+
+                for (ApplicationStateChangedCallback callback : mCallbackList) {
+                    callback.onApplicationShown(hiddenDuration);
+                }
+            }
+
             LogUtils.info(TAG, "%s>>>onResume()", activity.getClass().getSimpleName());
             final int index = mActivityHolder.indexOf(activity);
             if (index < 0)
@@ -82,14 +118,12 @@ public class ActivityStack {
                 return;
 
             if (index != (size - 1)) {
-                if (isDebug)
-                    Log.e(TAG, "start order activity " + activity + " old index " + index);
+                LogUtils.error(TAG, "start order activity " + activity + " old index " + index);
 
                 removeActivity(activity);
                 addActivity(activity);
 
-                if (isDebug)
-                    Log.e(TAG, "end order activity " + activity + " new index " + mActivityHolder.indexOf(activity));
+                LogUtils.error(TAG, "end order activity " + activity + " new index " + mActivityHolder.indexOf(activity));
             }
         }
 
@@ -97,6 +131,15 @@ public class ActivityStack {
         public void onActivityPaused(@NonNull Activity activity) {
             LogUtils.info(TAG, "%s>>>onPause()", activity.getClass().getSimpleName());
             mActiveCount--;
+
+            if (mActiveCount <= 0) {
+                isApplicationHidden = true;
+                mApplicationHiddenTimestamp = System.currentTimeMillis();
+
+                for (ApplicationStateChangedCallback callback : mCallbackList) {
+                    callback.onApplicationHidden();
+                }
+            }
         }
 
         @Override
@@ -118,17 +161,13 @@ public class ActivityStack {
 
     private String getCurrentStack() {
         Object[] arrActivity = mActivityHolder.toArray();
-        if (arrActivity != null) {
-            return Arrays.toString(arrActivity);
-        } else {
-            return "";
-        }
+        return Arrays.toString(arrActivity);
     }
 
     /**
      * 添加对象
      *
-     * @param activity
+     * @param activity activity对象
      */
     private void addActivity(Activity activity) {
         if (mActivityHolder.contains(activity))
@@ -136,23 +175,19 @@ public class ActivityStack {
 
         mActivityHolder.add(activity);
 
-        if (isDebug) {
-            Log.i(TAG, "+++++ " + activity + " " + mActivityHolder.size()
-                    + "\r\n" + getCurrentStack());
-        }
+        LogUtils.info(TAG, "+++++ " + activity + " " + mActivityHolder.size()
+                + "\r\n" + getCurrentStack());
     }
 
     /**
      * 移除对象
      *
-     * @param activity
+     * @param activity activity对象
      */
     private void removeActivity(Activity activity) {
         if (mActivityHolder.remove(activity)) {
-            if (isDebug) {
-                Log.e(TAG, "----- " + activity + " " + mActivityHolder.size()
-                        + "\r\n" + getCurrentStack());
-            }
+            LogUtils.error(TAG, "----- " + activity + " " + mActivityHolder.size()
+                    + "\r\n" + getCurrentStack());
         }
     }
 
@@ -161,11 +196,7 @@ public class ActivityStack {
         return mActiveCount;
     }
 
-    /**
-     * 返回栈中保存的对象个数
-     *
-     * @return
-     */
+    /** 返回栈中保存的对象个数 */
     public int size() {
         return mActivityHolder.size();
     }
@@ -173,9 +204,7 @@ public class ActivityStack {
     /**
      * 返回栈中指定位置的对象
      *
-     * @param index
-     *
-     * @return
+     * @param index 指定位置
      */
     public Activity getActivity(int index) {
         try {
@@ -185,11 +214,7 @@ public class ActivityStack {
         }
     }
 
-    /**
-     * 返回栈中最后一个对象
-     *
-     * @return
-     */
+    /** 返回栈中最后一个对象 */
     public Activity getLastActivity() {
         return getActivity(mActivityHolder.size() - 1);
     }
@@ -197,9 +222,7 @@ public class ActivityStack {
     /**
      * 是否包含指定对象
      *
-     * @param activity
-     *
-     * @return
+     * @param activity activity对象
      */
     public boolean containsActivity(Activity activity) {
         return mActivityHolder.contains(activity);
@@ -208,9 +231,7 @@ public class ActivityStack {
     /**
      * 返回栈中指定类型的所有对象
      *
-     * @param clazz
-     *
-     * @return
+     * @param clazz Activity的类对象
      */
     public List<Activity> getActivity(Class<? extends Activity> clazz) {
         final List<Activity> list = new ArrayList<>(1);
@@ -224,9 +245,7 @@ public class ActivityStack {
     /**
      * 返回栈中指定类型的第一个对象
      *
-     * @param clazz
-     *
-     * @return
+     * @param clazz Activity的类对象
      */
     public Activity getFirstActivity(Class<? extends Activity> clazz) {
         for (Activity item : mActivityHolder) {
@@ -239,9 +258,7 @@ public class ActivityStack {
     /**
      * 栈中是否包含指定类型的对象
      *
-     * @param clazz
-     *
-     * @return
+     * @param clazz Activity的类对象
      */
     public boolean containsActivity(Class<? extends Activity> clazz) {
         return getFirstActivity(clazz) != null;
@@ -250,7 +267,7 @@ public class ActivityStack {
     /**
      * 结束栈中指定类型的对象
      *
-     * @param clazz
+     * @param clazz Activity的类对象
      */
     public void finishActivity(Class<? extends Activity> clazz) {
         final List<Activity> list = getActivity(clazz);
@@ -262,7 +279,7 @@ public class ActivityStack {
     /**
      * 结束栈中除了activity外的所有对象
      *
-     * @param activity
+     * @param activity activity对象
      */
     public void finishActivityExcept(Activity activity) {
         for (Activity item : mActivityHolder) {
@@ -274,7 +291,7 @@ public class ActivityStack {
     /**
      * 结束栈中除了指定类型外的所有对象
      *
-     * @param clazz
+     * @param clazz Activity的类对象
      */
     public void finishActivityExcept(Class<? extends Activity> clazz) {
         for (Activity item : mActivityHolder) {
@@ -286,7 +303,7 @@ public class ActivityStack {
     /**
      * 结束栈中除了activity外的所有activity类型的对象
      *
-     * @param activity
+     * @param activity activity对象
      */
     public void finishSameClassActivityExcept(Activity activity) {
         for (Activity item : mActivityHolder) {
@@ -297,12 +314,27 @@ public class ActivityStack {
         }
     }
 
-    /**
-     * 结束所有对象
-     */
+    /** 结束所有对象 */
     public void finishAllActivity() {
         for (Activity item : mActivityHolder) {
             item.finish();
         }
     }
+
+
+    public interface ApplicationStateChangedCallback {
+
+        /** App被切换到后台 */
+        default void onApplicationHidden() {
+        }
+
+        /**
+         * App回到前台
+         *
+         * @param hiddenDuration 在后台的持续时间
+         */
+        default void onApplicationShown(long hiddenDuration) {
+        }
+    }
+
 }
