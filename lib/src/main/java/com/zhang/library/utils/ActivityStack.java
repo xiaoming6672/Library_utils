@@ -3,13 +3,14 @@ package com.zhang.library.utils;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import androidx.annotation.NonNull;
 
 /**
  * Activity队列
@@ -220,15 +221,6 @@ public class ActivityStack {
     }
 
     /**
-     * 是否包含指定对象
-     *
-     * @param activity activity对象
-     */
-    public boolean containsActivity(Activity activity) {
-        return mActivityHolder.contains(activity);
-    }
-
-    /**
      * 返回栈中指定类型的所有对象
      *
      * @param clazz Activity的类对象
@@ -253,6 +245,34 @@ public class ActivityStack {
                 return item;
         }
         return null;
+    }
+
+    /**
+     * 判断传入的tag，和堆栈中的Activity的toString()值是否相等
+     *
+     * @param tag tag
+     *
+     * @return <b>true:</b>存在对应的Activity
+     */
+    public boolean containsActivity(String tag) {
+        if (TextUtils.isEmpty(tag))
+            return false;
+
+        for (Activity activity : mActivityHolder) {
+            if (TextUtils.equals(activity.toString(), tag))
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 是否包含指定对象
+     *
+     * @param activity activity对象
+     */
+    public boolean containsActivity(Activity activity) {
+        return mActivityHolder.contains(activity);
     }
 
     /**
