@@ -85,17 +85,14 @@ public class ActivityStack {
     private final Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
         @Override
         public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
-            LogUtils.info(TAG, "%s>>>onCreate()", activity.getClass().getSimpleName());
+            LogUtils.info(TAG, "%s>>>onCreate()", activity.getClass().getName());
             addActivity(activity);
         }
 
         @Override
         public void onActivityStarted(@NonNull Activity activity) {
-            LogUtils.info(TAG, "%s>>>onStart()", activity.getClass().getSimpleName());
-        }
+            LogUtils.info(TAG, "%s>>>onStart()", activity.getClass().getName());
 
-        @Override
-        public void onActivityResumed(@NonNull Activity activity) {
             mActiveCount++;
 
             if (isApplicationHidden) {
@@ -108,8 +105,11 @@ public class ActivityStack {
                     callback.onApplicationShown(hiddenDuration);
                 }
             }
+        }
 
-            LogUtils.info(TAG, "%s>>>onResume()", activity.getClass().getSimpleName());
+        @Override
+        public void onActivityResumed(@NonNull Activity activity) {
+            LogUtils.info(TAG, "%s>>>onResume()", activity.getClass().getName());
             final int index = mActivityHolder.indexOf(activity);
             if (index < 0)
                 return;
@@ -130,7 +130,13 @@ public class ActivityStack {
 
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
-            LogUtils.info(TAG, "%s>>>onPause()", activity.getClass().getSimpleName());
+            LogUtils.info(TAG, "%s>>>onPause()", activity.getClass().getName());
+        }
+
+        @Override
+        public void onActivityStopped(@NonNull Activity activity) {
+            LogUtils.info(TAG, "%s>>>onStop()", activity.getClass().getName());
+
             mActiveCount--;
 
             if (mActiveCount <= 0) {
@@ -144,18 +150,13 @@ public class ActivityStack {
         }
 
         @Override
-        public void onActivityStopped(@NonNull Activity activity) {
-            LogUtils.info(TAG, "%s>>>onStop()", activity.getClass().getSimpleName());
-        }
-
-        @Override
         public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-            LogUtils.info(TAG, "%s>>>onSaveInstanceState()", activity.getClass().getSimpleName());
+            LogUtils.info(TAG, "%s>>>onSaveInstanceState()", activity.getClass().getName());
         }
 
         @Override
         public void onActivityDestroyed(@NonNull Activity activity) {
-            LogUtils.info(TAG, "%s>>>onDestroy()", activity.getClass().getSimpleName());
+            LogUtils.info(TAG, "%s>>>onDestroy()", activity.getClass().getName());
             removeActivity(activity);
         }
     };
