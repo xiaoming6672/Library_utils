@@ -1,5 +1,7 @@
 package com.zhang.library.utils;
 
+import android.text.format.DateUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,10 +17,32 @@ public class TimeUtils {
     private static final String TAG = TimeUtils.class.getSimpleName();
 
     public static final String DATE_FORMAT_DEFAULT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_FORMAT_DEFAULT_LONG = "yyyy-MM-dd HH:mm:ss.SSS";
     public static final String DATE_FORMAT_YYYY_MM_DD = "yyyy-MM-dd";
+    public static final String DATE_FORMAT_YYYY_MM_DD_SEPARATOR = "yyyy/MM/dd";
+    public static final String DATE_FORMAT_YYYY_MM_DD_CN = "yyyy年MM月dd日";
+    public static final String DATE_FORMAT_YYYY_MM = "yyyy-MM";
+    public static final String DATE_FORMAT_YYYY_MM_SEPARATOR = "yyyy/MM";
+    public static final String DATE_FORMAT_YYYY_MM_CN = "yyyy年MM月";
+    public static final String DATE_FORMAT_MM_DD = "MM-dd";
+    public static final String DATE_FORMAT_MM_DD_SEPARATOR = "MM/dd";
+    public static final String DATE_FORMAT_MM_DD_CN = "MM月dd日";
+    public static final String DATE_FORMAT_HH_MM_SS = "HH:mm:ss";
 
-    /** 一天的毫秒数 */
-    private static final int MILLISECOND_PER_DAY = 24 * 60 * 60 * 1000;
+    /** 秒（以毫秒为单位） */
+    public static final long SECOND_IN_MILLIS = DateUtils.SECOND_IN_MILLIS;
+    /** 分钟（以毫秒为单位） */
+    public static final long MINUTE_IN_MILLIS = SECOND_IN_MILLIS * 60;
+    /** 小时（毫秒） */
+    public static final long HOUR_IN_MILLIS = MINUTE_IN_MILLIS * 60;
+    /** 天（以毫秒为单位） */
+    public static final long DAY_IN_MILLIS = HOUR_IN_MILLIS * 24;
+    /** 周（以毫秒为单位） */
+    public static final long WEEK_IN_MILLIS = DAY_IN_MILLIS * 7;
+    /** 月份（单位：毫） 此处的月用30天暂代 */
+    public static final long MONTH_IN_MILLIS = DAY_IN_MILLIS * 30;
+    /** 365天的长度 */
+    public static final long YEAR_IN_MILLIS = DAY_IN_MILLIS * 365;
 
     private static final DateFormat mFormat;
 
@@ -32,7 +56,6 @@ public class TimeUtils {
      * @param targetTime 时间
      */
     public static String calculateTimeDifference(String targetTime) {
-
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         StringBuilder builder = new StringBuilder();
@@ -120,8 +143,34 @@ public class TimeUtils {
         return null;
     }
 
-    public static String getTimes(long time) {
-        return new SimpleDateFormat(DATE_FORMAT_DEFAULT, Locale.getDefault()).format(new Date(time));
+    /**
+     * 获取时间格式，时间格式为{@link #DATE_FORMAT_DEFAULT}
+     *
+     * @param timestamp 时间戳，毫秒为单位
+     */
+    public static String getTimes(long timestamp) {
+        return getTimes(DATE_FORMAT_DEFAULT, timestamp);
+    }
+
+    /**
+     * 获取时间格式
+     *
+     * @param format    时间格式
+     * @param timestamp 时间戳，毫秒为单位
+     */
+    public static String getTimes(String format, long timestamp) {
+        return getTimes(format, Locale.getDefault(), timestamp);
+    }
+
+    /**
+     * 获取时间格式
+     *
+     * @param format    时间格式
+     * @param locale    地区
+     * @param timestamp 时间戳，毫秒为单位
+     */
+    public static String getTimes(String format, Locale locale, long timestamp) {
+        return new SimpleDateFormat(format, locale).format(new Date(timestamp));
     }
 
     public static int getDaysBetween(String smdate, String bdate) throws ParseException {
@@ -154,7 +203,7 @@ public class TimeUtils {
         long time1 = cal.getTimeInMillis();
         cal.setTime(bigDate);
         long time2 = cal.getTimeInMillis();
-        long between_days = (time2 - time1) / MILLISECOND_PER_DAY;
+        long between_days = (time2 - time1) / DAY_IN_MILLIS;
 
         return Integer.parseInt(String.valueOf(between_days));
     }

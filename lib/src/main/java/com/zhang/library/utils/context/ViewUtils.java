@@ -11,6 +11,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,8 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -32,6 +35,7 @@ import com.zhang.library.utils.constant.ViewDirection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * View 工具类
@@ -52,14 +56,12 @@ public class ViewUtils extends ContextUtils {
      * @param view view控件
      * @param show 是否显示
      */
-    public static void setViewVisibleOrGone(View view, boolean show) {
-        if (view == null) {
-            return;
-        }
+    public static void setViewVisibleOrGone(@NonNull View view, boolean show) {
+        View target = Objects.requireNonNull(view, "控件view为空");
         if (show)
-            view.setVisibility(View.VISIBLE);
+            target.setVisibility(View.VISIBLE);
         else
-            view.setVisibility(View.GONE);
+            target.setVisibility(View.GONE);
     }
 
     /**
@@ -68,14 +70,34 @@ public class ViewUtils extends ContextUtils {
      * @param view view控件
      * @param show 是否显示
      */
-    public static void setViewVisibleOrInVisible(View view, boolean show) {
-        if (view == null) {
-            return;
-        }
+    public static void setViewVisibleOrInvisible(@NonNull View view, boolean show) {
+        View target = Objects.requireNonNull(view, "控件view为空");
         if (show)
-            view.setVisibility(View.VISIBLE);
+            target.setVisibility(View.VISIBLE);
         else
-            view.setVisibility(View.INVISIBLE);
+            target.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * 设置{@link TextView}的文案，如果文案不为空才显示，为空则设置隐藏
+     *
+     * @param view 控件
+     * @param text 文案
+     */
+    public static void setTextViewVisibleOrGone(@NonNull TextView view, @Nullable CharSequence text) {
+        Objects.requireNonNull(view, "控件view为空").setText(text);
+        setViewVisibleOrGone(view, !TextUtils.isEmpty(text));
+    }
+
+    /**
+     * 设置{@link TextView}的文案，如果文案不为空才显示，为空则设置不可见
+     *
+     * @param view 控件
+     * @param text 文案
+     */
+    public static void setTextViewVisibleOrInvisible(@NonNull TextView view, @Nullable CharSequence text) {
+        Objects.requireNonNull(view, "控件view为空").setText(text);
+        setViewVisibleOrInvisible(view, !TextUtils.isEmpty(text));
     }
 
     /**
@@ -86,7 +108,7 @@ public class ViewUtils extends ContextUtils {
      *
      * @return true-view处于设置的状态
      */
-    public static boolean setVisibility(View view, int visibility) {
+    public static boolean setViewVisibility(View view, int visibility) {
         if (view == null)
             return false;
 
@@ -99,6 +121,39 @@ public class ViewUtils extends ContextUtils {
         } else {
             throw new IllegalArgumentException("visibility is Illegal");
         }
+    }
+
+    /**
+     * 控件是否可见
+     *
+     * @param view 控件
+     *
+     * @return <b>true:</b>可见
+     */
+    public static boolean isViewVisible(@NonNull View view) {
+        return Objects.requireNonNull(view, "控件view为空").getVisibility() == View.VISIBLE;
+    }
+
+    /**
+     * 控件是否不可见
+     *
+     * @param view 控件
+     *
+     * @return <b>true:</b>不可见
+     */
+    public static boolean isViewInvisible(@NonNull View view) {
+        return Objects.requireNonNull(view, "控件view为空").getVisibility() == View.INVISIBLE;
+    }
+
+    /**
+     * 控件是否隐藏
+     *
+     * @param view 控件
+     *
+     * @return <b>true:</b>隐藏
+     */
+    public static boolean isViewGone(@NonNull View view) {
+        return Objects.requireNonNull(view, "控件view为空").getVisibility() == View.GONE;
     }
 
     /**
