@@ -70,4 +70,18 @@ public class InputMethodUtils extends ContextUtils {
         manager.hideSoftInputFromWindow(windowToken, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
+    /**
+     * 隐藏输入法
+     *
+     * @param windowToken token
+     * @param flag        隐藏的flag
+     */
+    public static void hideInputMethod(IBinder windowToken, int flag) {
+        if (windowToken == null)
+            return;
+
+        InputMethodManager manager = (InputMethodManager) get().getSystemService(Context.INPUT_METHOD_SERVICE);
+        manager.hideSoftInputFromWindow(windowToken, flag);
+    }
+
 }
