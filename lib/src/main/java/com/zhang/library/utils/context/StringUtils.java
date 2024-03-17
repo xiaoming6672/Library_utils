@@ -1,8 +1,11 @@
 package com.zhang.library.utils.context;
 
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+
+import androidx.annotation.NonNull;
 
 import com.zhang.library.utils.R;
 
@@ -40,8 +43,8 @@ public class StringUtils extends ContextUtils {
      * @param text   要显示的文字
      * @param target 关键字
      */
-    public static SpannableString getHightLightSpanString(String text, String target) {
-        return getHightLightSpanString(text, target, getColor(R.color.colorPrimary));
+    public static SpannableString getHighLightSpanString(String text, String target) {
+        return getHighLightSpanString(text, target, getColor(R.color.colorPrimary));
     }
 
     /**
@@ -51,7 +54,7 @@ public class StringUtils extends ContextUtils {
      * @param target 关键字
      * @param color  高亮颜色
      */
-    public static SpannableString getHightLightSpanString(String text, String target, int color) {
+    public static SpannableString getHighLightSpanString(String text, String target, int color) {
         SpannableString spannableString = new SpannableString(text);
 
         Pattern pattern = Pattern.compile(target);
@@ -62,4 +65,45 @@ public class StringUtils extends ContextUtils {
         }
         return spannableString;
     }
+
+
+    /**
+     * 转换字体颜色，将[font]和[/font]格式的文案，替换成html中的font标签
+     *
+     * @param content 内容
+     * @param color   十六进制颜色码格式，例如：#FFFFFF
+     */
+    public static CharSequence transformFontColor(@NonNull String content, @NonNull String color) {
+        String labelStart = "<font color='" + color + "'>";
+        String labelEnd = "</font>";
+
+        content = content.replace("[font]", labelStart);
+        content = content.replace("[/font]", labelEnd);
+
+        return Html.fromHtml(content);
+    }
+
+    /**
+     * 转换字体颜色，将[font]和[/font]格式的文案，替换成html中的font标签
+     *
+     * @param content 内容
+     * @param colors  十六进制颜色码格式，例如：#FFFFFF
+     */
+    public static CharSequence transformFontColor(@NonNull String content, @NonNull String... colors) {
+        int index = 0;
+        while (content.contains("[font]") && content.contains("[/font]")) {
+            String labelStart = "<font color='" + colors[index] + "'>";
+            String labelEnd = "</font>";
+
+            content = content.replaceFirst("\\[font]", labelStart);
+            content = content.replaceFirst("\\[/font]", labelEnd);
+
+            index++;
+            if (index >= colors.length)
+                break;
+        }
+
+        return Html.fromHtml(content);
+    }
+
 }
