@@ -5,12 +5,13 @@ import android.app.Application;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import androidx.annotation.NonNull;
 
 /**
  * Activity队列
@@ -101,8 +102,9 @@ public class ActivityStack {
                 long nowTime = System.currentTimeMillis();
                 long hiddenDuration = nowTime - mApplicationHiddenTimestamp;
 
-                for (ApplicationStateChangedCallback callback : mCallbackList) {
-                    callback.onApplicationShown(hiddenDuration);
+                Iterator<ApplicationStateChangedCallback> it = mCallbackList.iterator();
+                while (it.hasNext()) {
+                    it.next().onApplicationShown(hiddenDuration);
                 }
             }
         }
@@ -143,8 +145,9 @@ public class ActivityStack {
                 isApplicationHidden = true;
                 mApplicationHiddenTimestamp = System.currentTimeMillis();
 
-                for (ApplicationStateChangedCallback callback : mCallbackList) {
-                    callback.onApplicationHidden();
+                Iterator<ApplicationStateChangedCallback> it = mCallbackList.iterator();
+                while (it.hasNext()) {
+                    it.next().onApplicationHidden();
                 }
             }
         }
