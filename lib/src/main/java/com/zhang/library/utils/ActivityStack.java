@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -102,9 +101,8 @@ public class ActivityStack {
                 long nowTime = System.currentTimeMillis();
                 long hiddenDuration = nowTime - mApplicationHiddenTimestamp;
 
-                Iterator<ApplicationStateChangedCallback> it = mCallbackList.iterator();
-                while (it.hasNext()) {
-                    it.next().onApplicationShown(hiddenDuration);
+                for (ApplicationStateChangedCallback callback : new ArrayList<ApplicationStateChangedCallback>(mCallbackList)) {
+                    callback.onApplicationShown(hiddenDuration);
                 }
             }
         }
@@ -145,9 +143,8 @@ public class ActivityStack {
                 isApplicationHidden = true;
                 mApplicationHiddenTimestamp = System.currentTimeMillis();
 
-                Iterator<ApplicationStateChangedCallback> it = mCallbackList.iterator();
-                while (it.hasNext()) {
-                    it.next().onApplicationHidden();
+                for (ApplicationStateChangedCallback callback : new ArrayList<ApplicationStateChangedCallback>(mCallbackList)) {
+                    callback.onApplicationHidden();
                 }
             }
         }
