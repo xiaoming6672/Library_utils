@@ -22,7 +22,7 @@ public final class LogUtils {
     private static boolean isTrack;
 
     private LogUtils() {
-        isDebug = BuildConfig.DEBUG;
+        isDebug = false;
     }
 
     /**

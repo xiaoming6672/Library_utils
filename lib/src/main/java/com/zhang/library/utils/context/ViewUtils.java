@@ -1226,8 +1226,7 @@ public class ViewUtils extends ContextUtils {
 //                        activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 //                    }
 //                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ignored) {
             }
         }
         return result;
@@ -1262,8 +1261,7 @@ public class ViewUtils extends ContextUtils {
                 meizuFlags.setInt(lp, value);
                 window.setAttributes(lp);
                 result = true;
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ignored) {
             }
         }
         return result;
@@ -1369,12 +1367,7 @@ public class ViewUtils extends ContextUtils {
             mTouchSlopField.setAccessible(true);
             int touchSlop = (int) mTouchSlopField.get(rv);
             mTouchSlopField.set(rv, touchSlop * multiple);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
     //</editor-fold>

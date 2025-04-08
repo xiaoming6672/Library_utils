@@ -40,8 +40,8 @@ public class StringUtils extends ContextUtils {
      * @param text   要显示的文字
      * @param target 关键字
      */
-    public static SpannableString getHightLightSpanString(String text, String target) {
-        return getHightLightSpanString(text, target, getColor(R.color.colorPrimary));
+    public static SpannableString getHighlightSpanString(String text, String target) {
+        return getHighlightSpanString(text, target, getColor(R.color.colorPrimary));
     }
 
     /**
@@ -51,7 +51,7 @@ public class StringUtils extends ContextUtils {
      * @param target 关键字
      * @param color  高亮颜色
      */
-    public static SpannableString getHightLightSpanString(String text, String target, int color) {
+    public static SpannableString getHighlightSpanString(String text, String target, int color) {
         SpannableString spannableString = new SpannableString(text);
 
         Pattern pattern = Pattern.compile(target);
